@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>خارطة العراق التفاعلية</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body{
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  margin:0;
+  padding:20px;
+}
+#map{
+  height:450px;
+  border-radius:15px;
+}
+button{
+  margin:5px;
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>الخارطة التفاعلية</h2>
+
+<button onclick="updateMap('all')">الكل</button>
+<button onclick="updateMap('affected')">المتضررة</button>
+<button onclick="updateMap('hope')">الأمل</button>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+let map;
+let markers=[];
+
+/* 🟢 المواقع */
+const locations=[
+  {
+    id:"spiker",
+    name:"قاعدة سبايكر – تكريت",
+    coords:[34.7475,43.5847],
+    category:"affected"
+  },
+  {
+    id:"badoush",
+    name:"سجن بادوش",
+    coords:[36.4253,42.9231],
+    category:"affected"
+  },
+  {
+    id:"khasfa",
+    name:"حفرة الخسفة",
+    coords:[36.1458,43.1206],
+    category:"affected"
+  },
+  {
+    id:"sinjar",
+    name:"سنجار – جبل سنجار",
+    coords:[36.3195,41.8596],
+    category:"affected"
+  },
+  {
+    id:"mosul_old_city",
+    name:"المدينة القديمة – الموصل",
+    coords:[36.34,43.13],
+    category:"affected"
+  },
+  {
+    id:"erbil",
+    name:"أربيل",
+    coords:[36.1911,44.0092],
+    category:"hope"
+  }
+];
+
+/* 🟥 الشهداء */
+const martyrs=[
+  {locationId:"spiker",name:"باسم محمد عليوي فزع الركابي"},
+  {locationId:"spiker",name:"حسن ناصر حسين محمد آل أزيرج"},
+  {locationId:"badoush",name:"وليد خالد هامل"},
+  {locationId:"badoush",name:"حيدر قاسم خليل"},
+  {locationId:"khasfa",name:"الرائد يونس مرعي الحويزي"},
+  {locationId:"sinjar",name:"الشيخ ناصر باشا"},
+  {locationId:"mosul_old_city",name:"اللواء الركن نجم عبد الله السوداني"}
+];
+
+map=L.map("map").setView([33.3,44.3],6);
+
+L.tileLayer(
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+).addTo(map);
+
+function updateMap(filter){
+  markers.forEach(m=>map.removeLayer(m));
+  markers=[];
+
+  locations.forEach(loc=>{
+    if(filter==="all"||loc.category===filter){
+      const color=loc.category==="affected"?"#ef4444":"#22c55e";
+
+      const marker=L.circleMarker(loc.coords,{
+        color:color,
+        fillColor:color,
+        fillOpacity:0.8,
+        radius:12
+      }).addTo(map);
+
+      marker.bindPopup(`<b>${loc.name}</b><br>انقر مرتين لعرض الشهداء`);
+
+      marker.on("dblclick",()=>showMartyrs(loc.id,loc.coords));
+
+      markers.push(marker);
+    }
+  });
+}
+
+function showMartyrs(locationId,coords){
+  const list=martyrs.filter(m=>m.locationId===locationId);
+
+  if(list.length===0){
+    alert("لا توجد أسماء مسجلة");
+    return;
+  }
+
+  let html="<h3>الشهداء</h3><ul>";
+  list.forEach(m=>{
+    html+=`<li>${m.name}</li>`;
+  });
+  html+="</ul>";
+
+  L.popup()
+    .setLatLng(coords)
+    .setContent(html)
+    .openOn(map);
+}
+
+updateMap("all");
+</script>
+
+</body>
+</html>
