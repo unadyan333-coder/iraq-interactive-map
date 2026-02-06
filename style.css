@@ -1,0 +1,61 @@
+.main-layout {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+#map {
+  flex: 3;
+}
+
+.side-panel {
+  flex: 0;
+  background: #1e293b;
+  border-radius: 100px;
+  padding: 20px;
+  border: 2px solid #334155;
+  height: 250px;
+}
+
+.side-panel h3 {
+  margin-top: 20;
+  margin-bottom: 20px;
+  color: #38bdf8;
+}
+
+.side-panel button {
+  width: 100%;
+  margin-bottom: 3px;
+  padding: 5px;
+  background: #0f172a;
+  color: white;
+  border: 3px solid #334155;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.side-panel button:hover {
+  background: #38bdf8;
+  color: black;
+}
+/* تأثير النبض لمناطق الألم (الدوائر الحمراء) */
+@keyframes pulse-red {
+    0% { filter: drop-shadow(0 0 2px #ef4444); opacity: 0.8; }
+    50% { filter: drop-shadow(0 0 10px #ef4444); opacity: 1; }
+    100% { filter: drop-shadow(0 0 2px #ef4444); opacity: 0.8; }
+}
+
+.leaflet-interactive[stroke="#ef4444"] {
+    animation: pulse-red 2s infinite ease-in-out;
+}
+
+/* تأثير الإشراق لمناطق الأمل (الدوائر الخضراء) */
+@keyframes glow-green {
+    0% { filter: drop-shadow(0 0 5px #22c55e); }
+    100% { filter: drop-shadow(0 0 15px #22c55e); }
+}
+
+.leaflet-interactive[stroke="#22c55e"] {
+    animation: glow-green 3s infinite alternate;
+}
