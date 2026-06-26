@@ -1,152 +1,281 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>خارطة العراق التفاعلية</title>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<style>
-body{
-  background:#0f172a;
-  color:white;
-  font-family:Arial;
-  margin:0;
-  padding:20px;
-}
-#map{
-  height:450px;
-  border-radius:15px;
-}
-button{
-  margin:5px;
-  padding:10px 15px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خارطة العراق التفاعلية</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            height: 85%;
+        }
+        #map {
+            flex: 3;
+            border-radius: 15px;
+            border: 2px solid #334155;
+            height: 100%;
+            z-index: 1;
+        }
+        .side-panel {
+            flex: 1;
+            min-width: 250px;
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .side-panel h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #38bdf8;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .side-panel button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: #0f172a;
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+        .side-panel button:hover {
+            background: #38bdf8;
+            color: black;
+        }
+        #side-image-container {
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        #location-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #475569;
+            margin-bottom: 15px;
+        }
+        #no-image-placeholder {
+            width: 100%;
+            height: 80px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 2px dashed #475569;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 0.85em;
+        }
+        #location-title {
+            color: #f1f5f9;
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+        #location-desc {
+            color: #94a3b8;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        #default-msg {
+            margin-top: 20px;
+            color: #64748b;
+            text-align: center;
+            font-size: 0.9em;
+            padding-top: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-
 <body>
 
-<h2>الخارطة التفاعلية</h2>
+<h2 style="text-align:center; margin-bottom:15px; color:#e2e8f0;">خارطة العراق التفاعلية</h2>
 
-<button onclick="updateMap('all')">الكل</button>
-<button onclick="updateMap('affected')">المتضررة</button>
-<button onclick="updateMap('hope')">الأمل</button>
+<div class="main-layout">
+    <div class="side-panel">
+        <h3>التحكم</h3>
+        <button onclick="updateMap('all')">عرض الكل</button>
+        <button onclick="updateMap('affected')">المناطق المتضررة</button>
+        <button onclick="updateMap('hope')">مناطق الأمل</button>
 
-<div id="map"></div>
+        <div id="side-image-container">
+            <img id="location-image" src="" alt="">
+            <div id="no-image-placeholder">لا توجد صورة لهذا الموقع</div>
+            <h3 id="location-title"></h3>
+            <p id="location-desc"></p>
+        </div>
+        <div id="default-msg">
+            انقر على أي دائرة في الخريطة<br>لعرض الصور والتفاصيل هنا
+        </div>
+    </div>
+
+    <div id="map"></div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-let map;
-let markers=[];
+    let map;
+    let markers = [];
 
-/* 🟢 المواقع */
-const locations=[
-  {
-    id:"spiker",
-    name:"قاعدة سبايكر – تكريت",
-    coords:[34.7475,43.5847],
-    category:"affected"
-  },
-  {
-    id:"badoush",
-    name:"سجن بادوش",
-    coords:[36.4253,42.9231],
-    category:"affected"
-  },
-  {
-    id:"khasfa",
-    name:"حفرة الخسفة",
-    coords:[36.1458,43.1206],
-    category:"affected"
-  },
-  {
-    id:"sinjar",
-    name:"سنجار – جبل سنجار",
-    coords:[36.3195,41.8596],
-    category:"affected"
-  },
-  {
-    id:"mosul_old_city",
-    name:"المدينة القديمة – الموصل",
-    coords:[36.34,43.13],
-    category:"affected"
-  },
-  {
-    id:"erbil",
-    name:"أربيل",
-    coords:[36.1911,44.0092],
-    category:"hope"
-  }
-];
+   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    const locations = [
+        {
+            name: "قاعدة سبايكر – تكريت",
+            coords: [34.5969, 43.6786],
+            category: "affected",
+            image: "spiker.jpg",
+            info: "موقع جريمة سبايكر الأليمة (2014)، حيث استشهد قرابة 1700 من طلاب القوة الجوية."
+        },
+        {
+            name: "سجن بادوش – نينوى",
+            coords: [36.4253, 42.9231],
+            category: "affected",
+            image: "badosh.jpg",
+            info: "موقع مجزرة سجن بادوش التي راح ضحيتها المئات من السجناء العزل."
+        },
+        {
+            name: "حفرة الخسفة",
+            coords: [36.1458, 43.1206],
+            category: "affected",
+            image: "",
+            info: "أكبر مقبرة جماعية طبيعية في العراق، استخدمها التنظيم لإخفاء جرائمه."
+        },
+        {
+            name: "سنجار – جبل سنجار",
+            coords: [36.3195, 41.8596],
+            category: "affected",
+            image: "ezidien.jpg",
+            info: "رمز مأساة الإيزيديين، حيث حدثت عمليات الإبادة والتهجير القسري."
+        },
+        {
+            name: "المدينة القديمة – الموصل",
+            coords: [36.34, 43.13],
+            category: "affected",
+            image: "mosul.jpg",
+            info: "شهدت أشرس المعارك، دُمرت معالمها التاريخية لكنها تحررت بصمود أسطوري."
+        },
+        {
+            name: "الأنبار",
+            coords: [33.3750, 43.8850],
+            category: "affected",
+            image: "anbar.jpg",
+            info: "ساحة معارك واسعة ضد الإرهاب، من الفلوجة إلى القائم."
+        },
+        {
+            name: "بغداد – شارع المتنبي",
+            coords: [33.3152, 44.3661],
+            category: "hope",
+            image: "baghdad.jpg",
+            info: "شارع المتنبي، رئة بغداد الثقافية ورمز الحياة الذي ينبض بالفن والأدب."
+        },
+        {
+            name: "كربلاء المقدسة",
+            coords: [32.6160, 44.0249],
+            category: "hope",
+            image: "karbala.jpg",
+            info: "مركز ديني عالمي ونهضة عمرانية وتوسع في البنى التحتية لخدمة الملايين."
+        },
+        {
+            name: "البصرة",
+            coords: [30.5081, 47.7822],
+            category: "hope",
+            image: "basra.jpg",
+            info: "ثغر العراق الباسم، استضافت خليجي 25 وعكست كرم وضيافة العراقيين."
+        },
+        {
+            name: "أربيل",
+            coords: [36.1911, 44.0092],
+            category: "hope",
+            image: "erbil.jpg",
+            info: "عاصمة السياحة الصيفية، تتميز بقلعتها التاريخية والتطور العمراني السريع."
+        }
+    ];
 
-/* 🟥 الشهداء */
-const martyrs=[
-  {locationId:"spiker",name:"باسم محمد عليوي فزع الركابي"},
-  {locationId:"spiker",name:"حسن ناصر حسين محمد آل أزيرج"},
-  {locationId:"badoush",name:"وليد خالد هامل"},
-  {locationId:"badoush",name:"حيدر قاسم خليل"},
-  {locationId:"khasfa",name:"الرائد يونس مرعي الحويزي"},
-  {locationId:"sinjar",name:"الشيخ ناصر باشا"},
-  {locationId:"mosul_old_city",name:"اللواء الركن نجم عبد الله السوداني"}
-];
+    map = L.map('map').setView([33.3152, 44.3661], 6);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-map=L.map("map").setView([33.3,44.3],6);
+    function updateMap(filter) {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
 
-L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-).addTo(map);
+        document.getElementById('side-image-container').style.display = 'none';
+        document.getElementById('default-msg').style.display = 'block';
 
-function updateMap(filter){
-  markers.forEach(m=>map.removeLayer(m));
-  markers=[];
+        locations.forEach(loc => {
+            if (filter === 'all' || loc.category === filter) {
+                const color = loc.category === "affected" ? "#ef4444" : "#22c55e";
+                const marker = L.circleMarker(loc.coords, {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.7,
+                    radius: 12,
+                    weight: 2
+                }).addTo(map);
 
-  locations.forEach(loc=>{
-    if(filter==="all"||loc.category===filter){
-      const color=loc.category==="affected"?"#ef4444":"#22c55e";
-
-      const marker=L.circleMarker(loc.coords,{
-        color:color,
-        fillColor:color,
-        fillOpacity:0.8,
-        radius:12
-      }).addTo(map);
-
-      marker.bindPopup(<b>${loc.name}</b><br>انقر مرتين لعرض الشهداء);
-
-      marker.on("dblclick",()=>showMartyrs(loc.id,loc.coords));
-
-      markers.push(marker);
+                marker.on('click', () => showInSidePanel(loc));
+                marker.bindTooltip(loc.name);
+                markers.push(marker);
+            }
+        });
     }
-  });
-}
+          function showInSidePanel(location) {
 
-function showMartyrs(locationId,coords){
-  const list=martyrs.filter(m=>m.locationId===locationId);
+             console.log("Location:", location.name);
+             console.log("Image:", location.image);
 
-  if(list.length===0){
-    alert("لا توجد أسماء مسجلة");
-    return;
-  }
+            document.getElementById('default-msg').style.display = 'none';
+            imgEl.alt = location.name;
 
-  let html="<h3>الشهداء</h3><ul>";
-  list.forEach(m=>{
-    html+=<li>${m.name}</li>;
-  });
-  html+="</ul>";
+            imgEl.onerror = function () {
+                imgEl.style.display = "none";
+                placeholder.style.display = "flex";
+                placeholder.textContent = "⚠️";
+            };
 
-  L.popup()
-    .setLatLng(coords)
-    .setContent(html)
-    .openOn(map);
-}
+            imgEl.src = "";
+            imgEl.src = location.image;
+        } else {
+            imgEl.style.display = "none";
+            placeholder.style.display = "flex";
+            placeholder.textContent = "لا توجد صورة لهذا الموقع";
+        }
 
-updateMap("all");
+        document.getElementById('location-title').innerText = location.name;
+        document.getElementById('location-desc').innerText  = location.info;
+    }
+
+    updateMap('all');
 </script>
-
 </body>
 </html>
