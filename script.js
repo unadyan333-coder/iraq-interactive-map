@@ -31,7 +31,7 @@ const locations = [
         name: "سنجار – جبل سنجار",
         coords: [36.3195, 41.8596],
         category: "affected",
-        image: "",
+        image: "images/ezidien.jpg",
         info: "رمز مأساة الإيزيديين، حيث حدثت عمليات الإبادة والتهجير القسري."
     },
     {
@@ -47,7 +47,7 @@ const locations = [
         name: "الأنبار",
         coords: [33.3750, 43.8850],
         category: "affected",
-        image: "images/anbar(1).jpg",
+        image: "images/anbar (1).jpg",
         info: "ساحة معارك واسعة ضد الإرهاب، من الفلوجة إلى القائم."
     },
     {
