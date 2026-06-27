@@ -31,7 +31,7 @@ const locations = [
         name: "سنجار – جبل سنجار",
         coords: [36.3195, 41.8596],
         category: "affected",
-        image: "images/ezidien.jpg",
+        image: "",
         info: "رمز مأساة الإيزيديين، حيث حدثت عمليات الإبادة والتهجير القسري."
     },
     {
