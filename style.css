@@ -1,61 +1,128 @@
+body {
+    background: #0f172a;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #e2e8f0;
+}
+
 .main-layout {
-  display: flex;
-  gap: 20px;
-  width: 100%;
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    height: 85%;
 }
 
 #map {
-  flex: 3;
+    flex: 3;
+    border-radius: 15px;
+    border: 2px solid #334155;
+    height: 100%;
+    z-index: 1;
 }
 
 .side-panel {
-  flex: 0;
-  background: #1e293b;
-  border-radius: 100px;
-  padding: 20px;
-  border: 2px solid #334155;
-  height: 250px;
+    flex: 1;
+    min-width: 250px;
+    background: #1e293b;
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #334155;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
 .side-panel h3 {
-  margin-top: 20;
-  margin-bottom: 20px;
-  color: #38bdf8;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #38bdf8;
+    text-align: center;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 10px;
 }
 
 .side-panel button {
-  width: 100%;
-  margin-bottom: 3px;
-  padding: 5px;
-  background: #0f172a;
-  color: white;
-  border: 3px solid #334155;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: 0.3s;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: #0f172a;
+    color: white;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
 }
 
 .side-panel button:hover {
-  background: #38bdf8;
-  color: black;
-}
-/* تأثير النبض لمناطق الألم (الدوائر الحمراء) */
-@keyframes pulse-red {
-    0% { filter: drop-shadow(0 0 2px #ef4444); opacity: 0.8; }
-    50% { filter: drop-shadow(0 0 10px #ef4444); opacity: 1; }
-    100% { filter: drop-shadow(0 0 2px #ef4444); opacity: 0.8; }
+    background: #38bdf8;
+    color: black;
 }
 
-.leaflet-interactive[stroke="#ef4444"] {
-    animation: pulse-red 2s infinite ease-in-out;
+#side-image-container {
+    margin-top: 20px;
+    text-align: center;
+    border-top: 1px solid #334155;
+    padding-top: 20px;
+    display: none;
+    animation: fadeIn 0.5s ease;
 }
 
-/* تأثير الإشراق لمناطق الأمل (الدوائر الخضراء) */
-@keyframes glow-green {
-    0% { filter: drop-shadow(0 0 5px #22c55e); }
-    100% { filter: drop-shadow(0 0 15px #22c55e); }
+#location-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #475569;
+    margin-bottom: 15px;
+    display: none;
 }
 
-.leaflet-interactive[stroke="#22c55e"] {
-    animation: glow-green 3s infinite alternate;
+#no-image-placeholder {
+    width: 100%;
+    height: 80px;
+    background: #0f172a;
+    border-radius: 10px;
+    border: 2px dashed #475569;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.85em;
+}
+
+#location-title {
+    color: #f1f5f9;
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+}
+
+#location-desc {
+    color: #94a3b8;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+#default-msg {
+    margin-top: 20px;
+    color: #64748b;
+    text-align: center;
+    font-size: 0.9em;
+    padding-top: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
