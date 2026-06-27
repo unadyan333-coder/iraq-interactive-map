@@ -47,7 +47,7 @@ const locations = [
         name: "الأنبار",
         coords: [33.3750, 43.8850],
         category: "affected",
-        image: "images/anbar.jpg",
+        image: "images/anbar(1).jpg",
         info: "ساحة معارك واسعة ضد الإرهاب، من الفلوجة إلى القائم."
     },
     {
